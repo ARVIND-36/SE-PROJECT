@@ -1,0 +1,18 @@
+version: "3.9"
+
+services:
+  postgres:
+    image: postgres:15
+    container_name: banking_postgres
+    restart: always
+    environment:
+      POSTGRES_USER: bank_user
+      POSTGRES_PASSWORD: bank_pass
+      POSTGRES_DB: banking_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+volumes:
+  postgres_data:
