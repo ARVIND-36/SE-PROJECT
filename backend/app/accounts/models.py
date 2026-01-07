@@ -1,8 +1,7 @@
-from sqlalchemy import Column, Integer, String, ForeignKey
-from sqlalchemy.orm import declarative_base
-from app.db.database import engine
-
-Base = declarative_base()
+from sqlalchemy import Column, Integer, String, ForeignKey, Float, DateTime
+from sqlalchemy.orm import relationship
+from datetime import datetime, timezone
+from app.db.base import Base
 
 class Account(Base):
     __tablename__ = "accounts"
@@ -11,6 +10,10 @@ class Account(Base):
     account_number = Column(String, unique=True, nullable=False)
     account_type = Column(String, nullable=False)  # savings / current
     status = Column(String, default="ACTIVE")      # ACTIVE / FROZEN
-    user_id = Column(Integer, nullable=False)
-
-Base.metadata.create_all(bind=engine)
+    balance = Column(Float, default=0.0, nullable=False)
+    user_id = Column(Integer, ForeignKey("users.id", ondelete="CASCADE"), nullable=False)
+    created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc))
+    
+    # Relationships
+    user = relationship("User", back_populates="accounts")
+    transactions = relationship("Transaction", back_populates="account", cascade="all, delete-orphan")
