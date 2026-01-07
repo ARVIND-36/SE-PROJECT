@@ -1,12 +1,39 @@
 # Internet Banking System - SE Project
 
-A comprehensive banking system backend built with FastAPI, PostgreSQL, and Docker.
+A comprehensive full-stack banking system with React frontend, FastAPI backend, PostgreSQL database, and Docker.
+
+## 🔒 Security Notice
+- **Never commit `.env` files to git** - Contains sensitive credentials
+- Use `.env.example` as template for local setup
+- All sensitive data (passwords, API keys) must be in environment variables
 
 ## 🏗️ Architecture
 
 ```
 SE-PROJECT/
-├── backend/
+├── frontend/                   # React + Vite frontend
+│   ├── src/
+│   │   ├── components/         # Reusable components
+│   │   │   ├── Layout.jsx      # Main layout with navbar
+│   │   │   └── ProtectedRoute.jsx  # Auth route protection
+│   │   ├── context/
+│   │   │   └── AuthContext.jsx # Authentication state
+│   │   ├── pages/              # Page components
+│   │   │   ├── Login.jsx
+│   │   │   ├── Register.jsx
+│   │   │   ├── Dashboard.jsx
+│   │   │   ├── Accounts.jsx
+│   │   │   ├── Transfer.jsx
+│   │   │   ├── Deposit.jsx
+│   │   │   └── Loans.jsx
+│   │   ├── services/
+│   │   │   └── api.js          # API client with axios
+│   │   ├── styles/             # CSS modules
+│   │   └── main.jsx            # App entry point
+│   ├── package.json
+│   ├── vite.config.js
+│   └── Dockerfile
+├── backend/                    # FastAPI backend
 │   ├── app/
 │   │   ├── main.py              # FastAPI application entry point
 │   │   ├── auth/                # Authentication module
@@ -37,6 +64,14 @@ SE-PROJECT/
 ```
 
 ## ✨ Features
+
+### Frontend Features
+- **Modern React UI** with Vite for fast development
+- **Responsive Design** works on desktop, tablet, and mobile
+- **Protected Routes** with JWT authentication
+- **Real-time Validation** on all forms
+- **Error Handling** with user-friendly messages
+- **Clean UX** with loading states and success notifications
 
 ### 1. **User Management**
 - User registration with role validation (customer/employee/admin)
@@ -78,7 +113,8 @@ SE-PROJECT/
 
 ### Prerequisites
 - Docker & Docker Compose
-- Python 3.10+ (for local development)
+- Node.js 18+ (for local frontend development)
+- Python 3.10+ (for local backend development)
 - PostgreSQL 15 (if running without Docker)
 
 ### Installation
@@ -91,7 +127,7 @@ cd SE-PROJECT
 
 2. **Environment Configuration**
 
-The `.env` file is already configured with:
+The `backend/.env` file is already configured with:
 ```env
 DB_USER=bank_user
 DB_PASSWORD=bank_pass
@@ -106,23 +142,27 @@ ACCESS_TOKEN_EXPIRE_MINUTES=60
 
 **⚠️ Important:** Change `SECRET_KEY` in production!
 
-3. **Run with Docker**
+3. **Run with Docker (Recommended)**
 
 ```bash
-# Start all services
+# Start all services (PostgreSQL, Backend, Frontend)
 docker-compose up -d
 
 # Check logs
-docker-compose logs -f backend
+docker-compose logs -f
 
 # Stop services
 docker-compose down
 ```
 
-The API will be available at `http://localhost:8000`
+**Access the application:**
+- **Frontend**: http://localhost:3000
+- **Backend API**: http://localhost:8000
+- **API Docs**: http://localhost:8000/docs
 
 ### Local Development (Without Docker)
 
+**Backend:**
 ```bash
 cd backend
 
@@ -142,6 +182,59 @@ docker-compose up -d postgres
 # Run server
 uvicorn app.main:app --reload
 ```
+
+**Frontend:**
+```bash
+cd frontend
+
+# Install dependencies
+npm install
+
+# Run development server
+npm run dev
+```
+
+## 🎨 Frontend Usage Guide
+
+### First Time Setup
+
+1. **Register an Account**
+   - Navigate to http://localhost:3000
+   - Click "Register here"
+   - Fill in username, password (8+ chars with letters & digits), and select role
+   - Click "Register"
+
+2. **Login**
+   - Enter your username and password
+   - Click "Login"
+   - You'll be redirected to the dashboard
+
+3. **Create an Account**
+   - Go to "Accounts" in the navigation
+   - Click "+ Create New Account"
+   - Select account type (savings/current)
+   - Click "Create Account"
+
+4. **Make a Deposit**
+   - Go to "Deposit" in the navigation
+   - Enter your account ID and amount
+   - Click "Deposit Money"
+
+5. **Transfer Money**
+   - Go to "Transfer" in the navigation
+   - Enter from account ID, to account ID, and amount
+   - Click "Transfer Money"
+   - Note: Daily limit is ₹25,000
+
+6. **Apply for Loan**
+   - Go to "Loans" in the navigation
+   - Enter loan amount
+   - Click "Apply for Loan"
+   - View your CIBIL score and interest rate
+
+7. **Freeze/Unfreeze Account**
+   - Go to "Accounts"
+   - Click "Freeze Account" or "Unfreeze Account" on any account card
 
 ## 📚 API Documentation
 
@@ -268,13 +361,25 @@ curl -X POST http://localhost:8000/transactions/transfer \
 
 ## 🔧 Technology Stack
 
-- **Backend Framework**: FastAPI 0.115.6
+### Frontend
+- **Framework**: React 18.2.0
+- **Build Tool**: Vite 5.0.8
+- **Routing**: React Router DOM 6.20.0
+- **HTTP Client**: Axios 1.6.2
+- **Styling**: Custom CSS with CSS Variables
+- **State Management**: React Context API
+
+### Backend
+- **Framework**: FastAPI 0.115.6
 - **Database**: PostgreSQL 15
 - **ORM**: SQLAlchemy 2.0.36
 - **Authentication**: JWT (python-jose)
 - **Password Hashing**: Passlib + bcrypt 3.2.2
-- **Containerization**: Docker & Docker Compose
 - **ASGI Server**: Uvicorn
+
+### DevOps
+- **Containerization**: Docker & Docker Compose
+- **Database Management**: PostgreSQL with Docker volumes
 
 ## 📋 Business Rules
 
@@ -312,6 +417,21 @@ docker-compose up -d postgres
 docker-compose logs postgres
 ```
 
+### Frontend CORS Issues
+If you encounter CORS errors, ensure:
+1. Backend is running on port 8000
+2. Frontend proxy is configured in `vite.config.js`
+3. Or add CORS middleware to backend `main.py`
+
+### Docker Build Issues
+If Docker build fails:
+```bash
+# Clean rebuild
+docker-compose down -v
+docker-compose build --no-cache
+docker-compose up -d
+```
+
 ## 🔒 Security Considerations
 
 - ✅ Environment variables for secrets
@@ -319,9 +439,12 @@ docker-compose logs postgres
 - ✅ JWT token expiration (60 minutes)
 - ✅ Input validation on all endpoints
 - ✅ Role-based validation
+- ✅ Protected routes in frontend
+- ✅ Token stored in localStorage (consider httpOnly cookies for production)
 - ⚠️ TODO: Add rate limiting
 - ⚠️ TODO: Implement HTTPS in production
 - ⚠️ TODO: Add refresh token mechanism
+- ⚠️ TODO: Implement CSRF protection
 
 
 ## 📝 Development Notes

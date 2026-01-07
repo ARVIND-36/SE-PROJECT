@@ -8,7 +8,6 @@ def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(securit
     """Dependency to get current authenticated user from JWT token"""
     token = credentials.credentials
     payload = verify_token(token)
-    
     if payload is None:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
