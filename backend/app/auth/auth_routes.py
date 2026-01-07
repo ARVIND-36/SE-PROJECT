@@ -95,8 +95,20 @@ def register_init(data: RegistrationInit, db: Session = Depends(get_db)):
         "valid_for": "5 minutes"
     }
 
+class RegistrationVerify(BaseModel):
+    email: EmailStr
+    otp: str
+    password: str
+    full_name: str
+    phone: str
+    pan_number: str
+    monthly_income: float
+    employment_status: str
+    date_of_birth: str
+    address: str
+
 @router.post("/register/verify")
-def register_verify(data: RegistrationComplete, registration_data: RegistrationInit, db: Session = Depends(get_db)):
+def register_verify(data: RegistrationVerify, db: Session = Depends(get_db)):
     """
     Step 2: Complete registration after OTP verification
     - Verifies OTP
@@ -134,14 +146,14 @@ def register_verify(data: RegistrationComplete, registration_data: RegistrationI
         username=username,
         hashed_password=hash_password(data.password),
         role="customer",
-        full_name=registration_data.full_name,
+        full_name=data.full_name,
         email=data.email,
-        phone=registration_data.phone,
-        address=registration_data.address,
-        date_of_birth=datetime.strptime(registration_data.date_of_birth, "%Y-%m-%d").date(),
-        pan_number=registration_data.pan_number,
-        monthly_income=registration_data.monthly_income,
-        employment_status=registration_data.employment_status
+        phone=data.phone,
+        address=data.address,
+        date_of_birth=datetime.strptime(data.date_of_birth, "%Y-%m-%d").date(),
+        pan_number=data.pan_number,
+        monthly_income=data.monthly_income,
+        employment_status=data.employment_status
     )
     db.add(new_user)
     db.flush()  # Get user.id
